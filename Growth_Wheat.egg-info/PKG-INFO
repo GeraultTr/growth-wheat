@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: Growth-Wheat
+Version: 1.0
+Summary: Model of leaf growth for wheat
+Home-page: https://sourcesup.renater.fr/projects/growth-wheat/
+Download-URL: https://sourcesup.renater.fr/frs/download.php/latestfile/2184/growthwheat.zip
+Author: M.Gauthier, C.Chambon, R.Barillot
+Author-email: camille.chambon@inra.fr, romain.barillot@inra.fr
+License: CeCILL-C
+Keywords: functional-structural plant model,wheat,leaf growth,morphogenesis,trophic status,carbon,nitrogen,metabolism
+License-File: LICENSE
+License-File: AUTHORS
+
+A mechanistic model of leaf growth for wheat that accounts for the CN status
