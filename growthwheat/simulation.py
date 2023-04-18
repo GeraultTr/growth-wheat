@@ -57,7 +57,7 @@ class Simulation(object):
     """The Simulation class permits to initialize and run a simulation.
     """
 
-    def __init__(self, delta_t=1, update_parameters=None):
+    def __init__(self, delta_t=1, update_parameters=None, cnwheat_roots=True):
 
         #: The inputs of growth-Wheat.
         #:
@@ -85,6 +85,8 @@ class Simulation(object):
         #: Update parameters if specified
         if update_parameters:
             parameters.__dict__.update(update_parameters)
+
+        self.cnwheat_roots = cnwheat_roots
 
     def initialize(self, inputs):
         """
@@ -366,30 +368,31 @@ class Simulation(object):
         # --------------------------------
         # -------------- Roots -----------
         # --------------------------------
-        for root_id, root_inputs in all_roots_inputs.items():
-            curr_root_outputs = all_roots_outputs[root_id]
+        if self.cnwheat_roots:
+            for root_id, root_inputs in all_roots_inputs.items():
+                curr_root_outputs = all_roots_outputs[root_id]
 
-            axe_id = root_id[:2]
-            curr_axis_outputs = all_axes_outputs[axe_id]
+                axe_id = root_id[:2]
+                curr_axis_outputs = all_axes_outputs[axe_id]
 
-            # Temperature-compensated time (delta_teq)
-            delta_teq = all_axes_inputs[axe_id]['delta_teq_roots']
+                # Temperature-compensated time (delta_teq)
+                delta_teq = all_axes_inputs[axe_id]['delta_teq_roots']
 
-            # Growth
-            mstruct_C_growth, mstruct_growth, Nstruct_growth, Nstruct_N_growth = model.calculate_roots_mstruct_growth(root_inputs['sucrose'], root_inputs['amino_acids'],
-                                                                                                                      root_inputs['mstruct'], delta_teq, postflowering_stages)
-            # Respiration growth
-            curr_root_outputs['Respi_growth'] = RespirationModel.R_growth(mstruct_C_growth)
+                # Growth
+                mstruct_C_growth, mstruct_growth, Nstruct_growth, Nstruct_N_growth = model.calculate_roots_mstruct_growth(root_inputs['sucrose'], root_inputs['amino_acids'],
+                                                                                                                          root_inputs['mstruct'], delta_teq, postflowering_stages)
+                # Respiration growth
+                curr_root_outputs['Respi_growth'] = RespirationModel.R_growth(mstruct_C_growth)
 
-            # Update of root outputs
-            curr_root_outputs['mstruct'] += mstruct_growth
-            curr_root_outputs['AA_consumption_mstruct'] = Nstruct_N_growth
-            curr_root_outputs['sucrose_consumption_mstruct'] = model.calculate_roots_s_mstruct_sucrose(mstruct_growth, Nstruct_N_growth)
-            curr_root_outputs['sucrose'] -= (curr_root_outputs['sucrose_consumption_mstruct'] + curr_root_outputs['Respi_growth'])
-            curr_root_outputs['Nstruct'] += Nstruct_growth
-            curr_root_outputs['amino_acids'] -= curr_root_outputs['AA_consumption_mstruct']
-            curr_root_outputs['delta_mstruct_growth'] = mstruct_growth
-            self.outputs['roots'][root_id] = curr_root_outputs
+                # Update of root outputs
+                curr_root_outputs['mstruct'] += mstruct_growth
+                curr_root_outputs['AA_consumption_mstruct'] = Nstruct_N_growth
+                curr_root_outputs['sucrose_consumption_mstruct'] = model.calculate_roots_s_mstruct_sucrose(mstruct_growth, Nstruct_N_growth)
+                curr_root_outputs['sucrose'] -= (curr_root_outputs['sucrose_consumption_mstruct'] + curr_root_outputs['Respi_growth'])
+                curr_root_outputs['Nstruct'] += Nstruct_growth
+                curr_root_outputs['amino_acids'] -= curr_root_outputs['AA_consumption_mstruct']
+                curr_root_outputs['delta_mstruct_growth'] = mstruct_growth
+                self.outputs['roots'][root_id] = curr_root_outputs
 
-            # Update of axis outputs
-            self.outputs['axes'][axe_id] = curr_axis_outputs
+                # Update of axis outputs
+                self.outputs['axes'][axe_id] = curr_axis_outputs
